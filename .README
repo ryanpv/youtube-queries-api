@@ -1,0 +1,8 @@
+BARRIERS/ISSUES:
+
+1. Processing my api key... process.env.YOUTUBE_TOKEN was not working for whatever reason. The .env file is in root while my        indexjs is inside of another folder. I tried the dotenv/config methods for resolving path, but I realize I needed the actual key and not exactly have it "resolved?". Url parameters for my 'const url' needed the actual value. This is to access it through the googleapi url where we need to include "key". My method to solve this was to just create a separate module and import it - that way I can simply acquire it's value. All works now
+
+2. Aim of this project is fairly simple - give me specific items in my liked videos list. To expand, I am trying to gather all my liked videos on youtube, loop through that list and return the ones with a topic of my choosing (ie. node, cars, pokemon, etc...).
+This is how I will approach writing the code. I understand this will require OAuth 2.0 in order to be able to access personal credentials.
+
+3. OAuth 2.0...

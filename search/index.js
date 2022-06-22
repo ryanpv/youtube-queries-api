@@ -9,8 +9,7 @@ const youtubeApi = google.youtube({
     version: 'v3',
     auth: apiKey
 });
-
-const path = require('path')
+const { OAuth2Client } = require('google-auth-library');
 
 // google.youtube('v3').search.list({
 //     key: process.env.YOUTUBE_TOKEN,
@@ -39,6 +38,7 @@ app.get('/search', async (req, res) => {
     } 
     catch(err) { console.log(err)}
 })
+
 // -------------PLAYLIST QUERIES--------------------
 app.get('/playlist/:pListParams', async (req, res) => {
     try{
@@ -53,7 +53,40 @@ app.get('/playlist/:pListParams', async (req, res) => {
     } 
     catch(err) { console.log(err)}
 })
-console.log(require("dotenv").config())
+
+// -------------LIKED VIDEOS-------------------
+app.get('/likedvideos', async (req, res) => {
+    try{
+        // const videoTopic = req.params.videoTopic
+        const url = `${ baseApiUrl }/videos?key=${ apiKey}&part=snippet%2CcontentDetails%2Cstatistics&maxResults=3&myRating=like`
+        
+        function authenticate() {
+            return gapi.auth2.getAuthInstance()
+            .signIn({scope: "https://www.googleapis.com/auth/youtube.readonly"})
+            .then(function() { console.log("Sign-in successful"); },
+            function(err) { console.error("Error signing in", err); });
+        }
+        function loadClient() {
+            gapi.client.setApiKey(apiKey);
+            return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+            .then(function() { console.log("GAPI client loaded for API"); },
+            function(err) { console.error("Error loading GAPI client for API", err); });
+        }
+        authenticate();
+        loadClient();
+        
+        const response = await axios.get(url);
+        const likedTitles = response.data.items.map(likedVideos => likedVideos.snippet.title)
+        
+        res.send({ likedTitles })
+
+    }
+    catch(err) { console.log(err) };
+});
+
+
+
+// var areEqual = string1.toUpperCase() === string2.toUpperCase();
 
 
 const port = process.env.PORT || 8989;
